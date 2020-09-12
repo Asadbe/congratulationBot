@@ -6,9 +6,12 @@ from telebot import types
 import psycopg2
 import time
 from datetime import datetime
+from flask import Flask, request
+import os
 
 bot  = telebot.TeleBot(config.token)
 
+server = Flask(__name__)
 
         
 con = psycopg2.connect(
@@ -145,12 +148,24 @@ def get(message):
 # Enable saving next step handlers to file "./.handlers-saves/step.save".
 # Delay=2 means that after any change in next step handlers (e.g. calling register_next_step_handler())
 # saving will hapen after delay 2 seconds.
-bot.enable_save_next_step_handlers(delay=2)
+# bot.enable_save_next_step_handlers(delay=2)
 
 # Load next_step_handlers from save file (default "./.handlers-saves/step.save")
 # WARNING It will work only if enable_save_next_step_handlers was called!
-bot.load_next_step_handlers()
+# bot.load_next_step_handlers()
 
 
-if __name__ == '__main__':
-    run()
+# if __name__ == '__main__':
+#     bot.polling(none_stop=True)
+
+@server.route('/' +config.token, methods=['POST'])
+def getMessage():
+   bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+   return "!", 200
+@server.route("/")
+def webhook():
+   bot.remove_webhook()
+   bot.set_webhook(url='https://dashboard.heroku.com/apps/udevs-birthday-bot' + config.token)
+   return "!", 200
+if __name__ == "__main__":
+   server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
