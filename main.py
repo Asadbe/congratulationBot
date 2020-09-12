@@ -28,6 +28,8 @@ con.close()
 @bot.message_handler(commands=[ 'start'])
 def main(message):
     while True:  
+    
+    
         con = psycopg2.connect(
             host = "ec2-54-144-177-189.compute-1.amazonaws.com",
             database = "do3q1sk5tpkh3",
@@ -151,4 +153,4 @@ bot.load_next_step_handlers()
 
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    run()
